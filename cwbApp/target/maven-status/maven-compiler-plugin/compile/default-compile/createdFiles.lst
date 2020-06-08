@@ -1,0 +1,8 @@
+idv\mibudin\cwbApp\core\cwb\CwbApi.class
+idv\mibudin\cwbApp\core\gui\InformationMapCanvas.class
+idv\mibudin\cwbApp\App.class
+idv\mibudin\cwbApp\core\gui\InformationMapPane.class
+idv\mibudin\cwbApp\core\net\HttpsConnector.class
+idv\mibudin\cwbApp\core\net\HttpsResponse.class
+idv\mibudin\cwbApp\test\Tester.class
+idv\mibudin\cwbApp\core\gui\JavafxApplication.class
