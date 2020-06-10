@@ -25,7 +25,7 @@ public class CwbApi
     public CwbApi(String authorizationKey)
     {
         setAuthorizationKey(authorizationKey);
-        setShouldReturnJson(false);
+        setShouldReturnJson(true);
     }
 
     public HttpsResponse requestDatastore(String dataId, Map<String, String> parameters)

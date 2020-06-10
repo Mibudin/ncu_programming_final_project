@@ -19,6 +19,9 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 
+/**
+ * Rewite this!
+ */
 public class InformationMapPane extends Pane
 {
     private Vector<Vector<Shape>> multiShapes;

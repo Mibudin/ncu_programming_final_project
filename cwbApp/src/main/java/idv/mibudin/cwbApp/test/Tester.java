@@ -4,6 +4,7 @@ package idv.mibudin.cwbApp.test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import idv.mibudin.cwbApp.core.cwb.CwbApi;
 import idv.mibudin.cwbApp.core.gui.JavafxApplication;
@@ -18,8 +19,8 @@ public class Tester
 {
     public static void test(String[] args)
     {
-        javafxAppTest(args);
-        // cwbApiTest();
+        // javafxAppTest(args);
+        cwbApiTest();
     }
 
     private static void javafxAppTest(String[] args)
@@ -36,7 +37,7 @@ public class Tester
     private static void cwbApiTest()
     {
         CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
-        ca.setShouldReturnJson(false);
+        ca.setShouldReturnJson(true);
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("limit", "3");

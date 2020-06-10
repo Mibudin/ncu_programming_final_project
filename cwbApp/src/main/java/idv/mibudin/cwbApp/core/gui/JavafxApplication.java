@@ -40,6 +40,7 @@ public class JavafxApplication extends Application
         {
             sb.append(temp);
         }
+        br.close();
         JSONObject mapData = new JSONObject(sb.toString());
         // System.out.println(sb.toString());
 
