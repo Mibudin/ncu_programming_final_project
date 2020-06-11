@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import idv.mibudin.cwbApp.core.data.TopoJson;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
@@ -44,12 +45,24 @@ public class JavafxApplication extends Application
         JSONObject mapData = new JSONObject(sb.toString());
         // System.out.println(sb.toString());
 
-        InformationMapPane imp = new InformationMapPane(mapData);
+        // InformationMapPane imp = new InformationMapPane(mapData);
 
-        // InformationMapCanvas imc = new InformationMapCanvas(640, 480);
-        // imc.draw();
+        // // InformationMapCanvas imc = new InformationMapCanvas(640, 480);
+        // // imc.draw();
 
-        Scene s = new Scene(imp, 1280, 720);
+        // Scene s = new Scene(imp, 1280, 720);
+        // s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
+        //     (MouseEvent mouseEvent) ->
+        //     {
+        //         System.out.println("> (" + mouseEvent.getX() + ", " + mouseEvent.getY() + ")");
+        //     }
+        // );
+
+        TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData, "COUNTY_MOI_1081121"));
+
+        Pane p = new Pane();
+        p.getChildren().addAll(tjr.renderToShapes());
+        Scene s = new Scene(p, 1280, 720);
         s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
             (MouseEvent mouseEvent) ->
             {
@@ -58,6 +71,7 @@ public class JavafxApplication extends Application
         );
 
         primaryStage.setTitle("JavaFX Test");
+        primaryStage.setResizable(false);
         primaryStage.setScene(s);
 		primaryStage.show();
 	}

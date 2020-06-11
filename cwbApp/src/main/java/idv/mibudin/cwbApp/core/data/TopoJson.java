@@ -21,12 +21,12 @@ public class TopoJson
     private TopologyObject topologyObject;
 
 
-    public TopoJson(String filePath) throws IOException
+    public TopoJson(String filePath, String objectsKey) throws IOException
     {
-        this(filePath, DEFAULT_ENCODING);
+        this(filePath, DEFAULT_ENCODING, objectsKey);
     }
 
-    public TopoJson(String filePath, String encoding) throws IOException
+    public TopoJson(String filePath, String encoding, String objectsKey) throws IOException
     {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), encoding));
         StringBuilder stringBuilder = new StringBuilder();
@@ -37,21 +37,21 @@ public class TopoJson
         }
         bufferedReader.close();
 
-        topologyObject = new TopologyObject(new JSONObject(stringBuilder.toString()));
+        topologyObject = new TopologyObject(new JSONObject(stringBuilder.toString()), objectsKey);
     }
 
-    public TopoJson(JSONObject topoJson)
+    public TopoJson(JSONObject topoJson, String objectsKey)
     {
-        topologyObject = new TopologyObject(topoJson);
+        topologyObject = new TopologyObject(topoJson, objectsKey);
     }
 
-    public void cacheDecodedArcs()
+    public TopologyObject getTopologyObject()
     {
-        topologyObject.cacheDecodedArcs();
+        return topologyObject;
     }
 
 
-    private static enum ObjectType
+    public static enum ObjectType
     {
         TOPOLOGY,
         POINT,
@@ -64,7 +64,7 @@ public class TopoJson
     }
 
 
-    private static class TopologyObject
+    public static class TopologyObject
     {
         private ObjectType type;
 
@@ -72,8 +72,6 @@ public class TopoJson
         private Vector2D transform_translate;
 
         private Vector<Vector<Vector2I>> arcs;
-
-        private Vector<Vector<Vector2D>> decodedArcsCache;
 
         /**
          * @deprecated Useless temporary. <p>
@@ -84,12 +82,12 @@ public class TopoJson
         private GeometryObject objects;
 
 
-        public TopologyObject(JSONObject topoJson)
+        public TopologyObject(JSONObject topoJson, String objectsKey)
         {
-            parseTopologyObject(topoJson);
+            parseTopologyObject(topoJson, objectsKey);
         }
 
-        private void parseTopologyObject(JSONObject topoJson)
+        private void parseTopologyObject(JSONObject topoJson, String objectsKey)
         {
             type = ObjectType.TOPOLOGY;
 
@@ -111,25 +109,25 @@ public class TopoJson
              */
 
             JSONArray arcsJsonArray = topoJson.getJSONArray("arcs");
-            arcs = new Vector<Vector<Vector2I>>();
+            arcs = new Vector<Vector<Vector2I>>(arcsJsonArray.length());
             for(int i = 0; i < arcsJsonArray.length(); i++)
             {
                 JSONArray arcJsonArray = arcsJsonArray.getJSONArray(i);
-                Vector<Vector2I> arc = new Vector<Vector2I>();
+                Vector<Vector2I> arc = new Vector<Vector2I>(arcJsonArray.length());
                 for(int j = 0; j < arcJsonArray.length(); j++)
                 {
                     JSONArray pointJsonArray = arcJsonArray.getJSONArray(j);
-                    arc.add(j, new Vector2I(pointJsonArray.getInt(0), pointJsonArray.getInt(0)));
+                    arc.add(j, new Vector2I(pointJsonArray.getInt(0), pointJsonArray.getInt(1)));
                 }
                 arcs.add(i, arc);
             }
 
-            objects = GeometryObject.createGeometryObject(topoJson.getJSONObject("objects"));
+            objects = GeometryObject.createGeometryObject(topoJson.getJSONObject("objects").getJSONObject(objectsKey));
         }
 
-        private void cacheDecodedArcs()
+        public Vector<Vector<Vector2D>> getDecodedArcs()
         {
-            decodedArcsCache = new Vector<Vector<Vector2D>>();
+            Vector<Vector<Vector2D>> decodedArcsCache = new Vector<Vector<Vector2D>>(arcs.size() * 2);
             for(int i = 0; i < arcs.size(); i++)
             {
                 decodedArcsCache.add(i, decodeArc(i));
@@ -138,11 +136,20 @@ public class TopoJson
             {
                 decodedArcsCache.add(i, decodeArc(-(i - arcs.size()) - 1));
             }
+
+            return decodedArcsCache;
         }
 
         private Vector2D transformPoint(Vector2I point)
         {
-            return new Vector2D(point).zoom(transform_scale).add(transform_translate);
+            return new Vector2D(point).zoom(transform_scale).add(transform_translate)
+                /**
+                 * TODO: For Test
+                 */
+                // ;
+                .add(new Vector2D(-118, -21.5))
+                // ;
+                .zoom(new Vector2D(150, 150));
         }
 
         private Vector<Vector2D> decodeArc(int arcIndex)
@@ -150,29 +157,32 @@ public class TopoJson
             boolean isReversed = arcIndex < 0;
             int realArcIndex = isReversed ? -arcIndex - 1 : arcIndex;
 
-            Vector<Vector2D> decodedArc = new Vector<Vector2D>();
             Vector<Vector2I> targetArc = arcs.get(realArcIndex);
-            if(!isReversed)
+            Vector<Vector2D> decodedArc = new Vector<Vector2D>(targetArc.size());
+
+            Vector2I cumulatePoint = new Vector2I(0, 0);
+            for(int i = 0; i < targetArc.size(); i++)
             {
-                for(int i = 0; i < targetArc.size(); i++)
-                {
-                    decodedArc.add(i, transformPoint(targetArc.get(i)));
-                }
+                cumulatePoint = cumulatePoint.add(targetArc.get(i));
+                decodedArc.add(i, transformPoint(cumulatePoint));
             }
-            else
+
+            if(isReversed)
             {
-                for(int i = 0; i < targetArc.size(); i++)
-                {
-                    decodedArc.add(i, transformPoint(targetArc.get(targetArc.size() - 1 - i)));
-                }
+                Collections.reverse(decodedArc);
             }
 
             return decodedArc;
         }
+
+        public GeometryObject getObjects()
+        {
+            return objects;
+        }
     }
 
 
-    private static abstract class GeometryObject
+    public static abstract class GeometryObject
     {
         private ObjectType type;
 
@@ -181,30 +191,30 @@ public class TopoJson
 
         private static GeometryObject createGeometryObject(JSONObject geometryObjectJson)
         {
-            switch(geometryObjectJson.getString("type"))
+            switch(getTypeByClassName(geometryObjectJson.getString("type")))
             {
-                case "Point":
-                    return new PointObject(geometryObjectJson);
-
-                case "MultiPoint":
-                    return new MultiPointObject(geometryObjectJson);
-
-                case "LineString":
-                    return new LineStringObject(geometryObjectJson);
-
-                case "MultiLineString":
-                    return new MultiLineStringObject(geometryObjectJson);
-
-                case "Polygon":
-                    return new PolygonObject(geometryObjectJson);
-
-                case "MultiPolygon":
-                    return new MultiPolygonObject(geometryObjectJson);
-
-                case "GeometryCollection":
+                case GEOMETRY_COLLECTION:
                     return new GeometryCollectionObject(geometryObjectJson);
 
-                case "Topology":
+                case POINT:
+                    return new PointObject(geometryObjectJson);
+
+                case MULTI_POINT:
+                    return new MultiPointObject(geometryObjectJson);
+
+                case LINE_STRING:
+                    return new LineStringObject(geometryObjectJson);
+
+                case MULTI_LINE_STRING:
+                    return new MultiLineStringObject(geometryObjectJson);
+
+                case POLYGON:
+                    return new PolygonObject(geometryObjectJson);
+
+                case MULTI_POLYGON:
+                    return new MultiPolygonObject(geometryObjectJson);
+
+                case TOPOLOGY:
                 default:
                     return null;
             }
@@ -242,7 +252,7 @@ public class TopoJson
     }
 
 
-    private static class GeometryCollectionObject extends GeometryObject
+    public static class GeometryCollectionObject extends GeometryObject
     {
         private Vector<GeometryObject> geometries;
 
@@ -258,16 +268,21 @@ public class TopoJson
             super.parseObjectJson(geometryObjectJson);
             
             JSONArray geometriesArray = geometryObjectJson.getJSONArray("geometries");
-            geometries = new Vector<GeometryObject>();
+            geometries = new Vector<GeometryObject>(geometriesArray.length());
             for(int i = 0; i < geometriesArray.length(); i++)
             {
                 geometries.add(i, GeometryObject.createGeometryObject(geometriesArray.getJSONObject(i)));
             }
         }
+
+        public Vector<GeometryObject> getGeometries()
+        {
+            return geometries;
+        }
     }
 
 
-    private static class PointObject extends GeometryObject
+    public static class PointObject extends GeometryObject
     {
         private PointObject(JSONObject geometryObjectJson)
         {
@@ -284,7 +299,7 @@ public class TopoJson
     }
 
 
-    private static class MultiPointObject extends GeometryObject
+    public static class MultiPointObject extends GeometryObject
     {
         private MultiPointObject(JSONObject geometryObjectJson)
         {
@@ -301,7 +316,7 @@ public class TopoJson
     }
 
 
-    private static class LineStringObject extends GeometryObject
+    public static class LineStringObject extends GeometryObject
     {
         private LineStringObject(JSONObject geometryObjectJson)
         {
@@ -318,7 +333,7 @@ public class TopoJson
     }
 
 
-    private static class MultiLineStringObject extends GeometryObject
+    public static class MultiLineStringObject extends GeometryObject
     {
         private MultiLineStringObject(JSONObject geometryObjectJson)
         {
@@ -335,7 +350,7 @@ public class TopoJson
     }
 
 
-    private static class PolygonObject extends GeometryObject
+    public static class PolygonObject extends GeometryObject
     {
         private Vector<Vector<Integer>> arcs;
 
@@ -351,21 +366,26 @@ public class TopoJson
             super.parseObjectJson(geometryObjectJson);
 
             JSONArray arcRingsJsonArray = geometryObjectJson.getJSONArray("arcs");
-            arcs = new Vector<Vector<Integer>>();
+            arcs = new Vector<Vector<Integer>>(arcRingsJsonArray.length());
             for(int i = 0; i < arcRingsJsonArray.length(); i++)
             {
                 JSONArray arcIndicesJsonArray = arcRingsJsonArray.getJSONArray(i);
-                arcs.add(i, new Vector<Integer>());
+                arcs.add(i, new Vector<Integer>(arcIndicesJsonArray.length()));
                 for(int j = 0; j < arcIndicesJsonArray.length(); j++)
                 {
                     arcs.get(i).add(j, arcIndicesJsonArray.getInt(j));
                 }
             }
         }
+
+        public Vector<Vector<Integer>> getArcs()
+        {
+            return arcs;
+        }
     }
 
 
-    private static class MultiPolygonObject extends GeometryObject
+    public static class MultiPolygonObject extends GeometryObject
     {
         private Vector<Vector<Vector<Integer>>> arcs;
 
@@ -380,21 +400,26 @@ public class TopoJson
             super.parseObjectJson(geometryObjectJson);
 
             JSONArray polygonArcsJsonArray = geometryObjectJson.getJSONArray("arcs");
-            arcs = new Vector<Vector<Vector<Integer>>>();
+            arcs = new Vector<Vector<Vector<Integer>>>(polygonArcsJsonArray.length());
             for(int i = 0; i < polygonArcsJsonArray.length(); i++)
             {
                 JSONArray arcRingsJsonArray = polygonArcsJsonArray.getJSONArray(i);
-                arcs.add(i, new Vector<Vector<Integer>>());
+                arcs.add(i, new Vector<Vector<Integer>>(arcRingsJsonArray.length()));
                 for(int j = 0; j < arcRingsJsonArray.length(); j++)
                 {
                     JSONArray arcIndicesJsonArray = arcRingsJsonArray.getJSONArray(j);
-                    arcs.get(i).add(j, new Vector<Integer>());
+                    arcs.get(i).add(j, new Vector<Integer>(arcIndicesJsonArray.length()));
                     for(int k = 0; k < arcIndicesJsonArray.length(); k++)
                     {
                         arcs.get(i).get(j).add(k, arcIndicesJsonArray.getInt(k));
                     }
                 }
             }
+        }
+
+        public Vector<Vector<Vector<Integer>>> getArcs()
+        {
+            return arcs;
         }
     }
 }

@@ -19,8 +19,8 @@ public class Tester
 {
     public static void test(String[] args)
     {
-        // javafxAppTest(args);
-        cwbApiTest();
+        javafxAppTest(args);
+        // cwbApiTest();
     }
 
     private static void javafxAppTest(String[] args)
