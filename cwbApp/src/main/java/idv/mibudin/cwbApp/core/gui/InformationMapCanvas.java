@@ -5,6 +5,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
 
+/**
+ * @deprecated <p>
+ * A canvas with the information map.
+ */
 public class InformationMapCanvas extends Canvas
 {
     public InformationMapCanvas(double width, double height)

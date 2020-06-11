@@ -8,7 +8,7 @@ import idv.mibudin.cwbApp.core.data.Vector2D;
 
 public class VectorTools
 {
-    public static Vector<Double> flatenVector2Ds(Vector<Vector2D> vector2Ds)
+    public static Vector<Double> flatenVector2Ds(final Vector<Vector2D> vector2Ds)
     {
         Vector<Double> flatenedVector2Ds = new Vector<Double>(vector2Ds.size() * 2);
         for(int i = 0; i < vector2Ds.size(); i++)
@@ -19,5 +19,22 @@ public class VectorTools
         }
 
         return flatenedVector2Ds;
+    }
+
+    public static <T> Vector<T> removeLastPoint(final Vector<T> vector2Ds)
+    {
+        Vector<T> changedVector2Ds = new Vector<T>(vector2Ds);
+        changedVector2Ds.remove(changedVector2Ds.size() - 1);
+
+        return changedVector2Ds;
+    }
+
+    public static <T> Vector<T> removeLastTwoPoint(final Vector<T> vector2Ds)
+    {
+        Vector<T> changedVector2Ds = new Vector<T>(vector2Ds);
+        changedVector2Ds.remove(changedVector2Ds.size() - 1);
+        changedVector2Ds.remove(changedVector2Ds.size() - 1);
+
+        return changedVector2Ds;
     }
 }

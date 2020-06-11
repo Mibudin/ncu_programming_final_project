@@ -328,7 +328,7 @@ public class TopoJsonRenderer
                 Vector<Integer> arcIndices = arcs.get(i);
                 for(int j = 0; j < arcIndices.size(); j++)
                 {
-                    polygon.getPoints().addAll(topologyObjectRenderer.accessFlatenedDecodedArc(arcIndices.get(j)));
+                    polygon.getPoints().addAll(VectorTools.removeLastTwoPoint(topologyObjectRenderer.accessFlatenedDecodedArc(arcIndices.get(j))));
                 }
                 polygons.add(i, polygon);
             }

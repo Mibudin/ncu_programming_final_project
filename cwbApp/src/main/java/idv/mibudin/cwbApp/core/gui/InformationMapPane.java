@@ -20,7 +20,8 @@ import javafx.scene.shape.Shape;
 
 
 /**
- * Rewite this!
+ * @deprecated <p>
+ * A Pane with the information map.
  */
 public class InformationMapPane extends Pane
 {

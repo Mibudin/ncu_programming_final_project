@@ -21,12 +21,12 @@ public class TopoJson
     private TopologyObject topologyObject;
 
 
-    public TopoJson(String filePath, String objectsKey) throws IOException
+    public TopoJson(String filePath) throws IOException
     {
-        this(filePath, DEFAULT_ENCODING, objectsKey);
+        this(filePath, DEFAULT_ENCODING);
     }
 
-    public TopoJson(String filePath, String encoding, String objectsKey) throws IOException
+    public TopoJson(String filePath, String encoding) throws IOException
     {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), encoding));
         StringBuilder stringBuilder = new StringBuilder();
@@ -37,12 +37,12 @@ public class TopoJson
         }
         bufferedReader.close();
 
-        topologyObject = new TopologyObject(new JSONObject(stringBuilder.toString()), objectsKey);
+        topologyObject = new TopologyObject(new JSONObject(stringBuilder.toString()));
     }
 
-    public TopoJson(JSONObject topoJson, String objectsKey)
+    public TopoJson(JSONObject topoJson)
     {
-        topologyObject = new TopologyObject(topoJson, objectsKey);
+        topologyObject = new TopologyObject(topoJson);
     }
 
     public TopologyObject getTopologyObject()
@@ -82,12 +82,12 @@ public class TopoJson
         private GeometryObject objects;
 
 
-        public TopologyObject(JSONObject topoJson, String objectsKey)
+        public TopologyObject(JSONObject topoJson)
         {
-            parseTopologyObject(topoJson, objectsKey);
+            parseTopologyObject(topoJson);
         }
 
-        private void parseTopologyObject(JSONObject topoJson, String objectsKey)
+        private void parseTopologyObject(JSONObject topoJson)
         {
             type = ObjectType.TOPOLOGY;
 
@@ -122,7 +122,7 @@ public class TopoJson
                 arcs.add(i, arc);
             }
 
-            objects = GeometryObject.createGeometryObject(topoJson.getJSONObject("objects").getJSONObject(objectsKey));
+            objects = GeometryObject.createGeometryObject(topoJson.getJSONObject("objects").getJSONObject(topoJson.getJSONObject("objects").keys().next()));
         }
 
         public Vector<Vector<Vector2D>> getDecodedArcs()
@@ -147,9 +147,10 @@ public class TopoJson
                  * TODO: For Test
                  */
                 // ;
-                .add(new Vector2D(-118, -21.5))
+                .zoom(new Vector2D(1, -1))
+                .add(new Vector2D(-117.5, 26.7))
                 // ;
-                .zoom(new Vector2D(150, 150));
+                .zoom(new Vector2D(180, 180));
         }
 
         private Vector<Vector2D> decodeArc(int arcIndex)

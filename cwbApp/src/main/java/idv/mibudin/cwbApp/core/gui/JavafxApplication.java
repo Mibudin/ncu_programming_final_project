@@ -21,6 +21,13 @@ import javafx.stage.Stage;
 
 public class JavafxApplication extends Application
 {
+    private static final int WIDTH  = 900;
+    private static final int HEIGHT = 900;
+
+    private static final String TITLE = "CWB API DEMO";
+    private static final boolean IS_RESIZABLE = false;
+
+
     public static void launchJavafxApplication(String[] args)
     {
         System.setProperty("prism.allowhidpi", "false");
@@ -28,12 +35,12 @@ public class JavafxApplication extends Application
         Application.launch(JavafxApplication.class, args);
     }
 
-	@Override
+    @Override
     public void start(Stage primaryStage) throws Exception
     {
         // FileInputStream fis = new FileInputStream("CwbApplet/res/informationMap/COUNTY_MOI_1081121 (2).json");
         // FileReader fr = new FileReader("D:/Workspaces/ncu_programming_final_project/res/informationMap/COUNTY_MOI_1081121 (2).json");
-        InputStreamReader isr = new InputStreamReader(new FileInputStream("D:/Workspaces/ncu_programming_final_project/res/informationMap/COUNTY_MOI_1081121 (2).json"), "UTF-8");
+        InputStreamReader isr = new InputStreamReader(new FileInputStream("../res/informationMap/COUNTY_MOI_1081121 (2).json"), "UTF-8");
         BufferedReader br = new BufferedReader(isr);
         StringBuilder sb = new StringBuilder();
         String temp;
@@ -58,11 +65,11 @@ public class JavafxApplication extends Application
         //     }
         // );
 
-        TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData, "COUNTY_MOI_1081121"));
+        TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData));
 
         Pane p = new Pane();
         p.getChildren().addAll(tjr.renderToShapes());
-        Scene s = new Scene(p, 1280, 720);
+        Scene s = new Scene(p, WIDTH, HEIGHT);
         s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
             (MouseEvent mouseEvent) ->
             {
@@ -70,9 +77,10 @@ public class JavafxApplication extends Application
             }
         );
 
-        primaryStage.setTitle("JavaFX Test");
-        primaryStage.setResizable(false);
+        primaryStage.setTitle(TITLE);
+        primaryStage.setResizable(IS_RESIZABLE);
+        primaryStage.centerOnScreen();
         primaryStage.setScene(s);
-		primaryStage.show();
-	}
+        primaryStage.show();
+    }
 }
