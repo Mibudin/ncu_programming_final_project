@@ -31,7 +31,10 @@ public class TopoJsonRenderer
     {
         this.topoJson = topoJson;
         topologyObjectRenderer = new TopologyObjectRenderer(topoJson.getTopologyObject());
+    }
 
+    public void cacheArcs()
+    {
         cacheDecodedArcs();
         cacheFlatenedDecodedArcs();
     }
@@ -49,6 +52,16 @@ public class TopoJsonRenderer
     public Vector<Shape> renderToShapes()
     {
         return topologyObjectRenderer.renderToShapes();
+    }
+
+    public TopoJson getTopoJson()
+    {
+        return topoJson;
+    }
+
+    public TopologyObjectRenderer getTopologyObjectRenderer()
+    {
+        return topologyObjectRenderer;
     }
 
 
@@ -303,8 +316,8 @@ public class TopoJsonRenderer
             /**
              * TODO: For Test
              */
-            shape.setFill(Color.gray(0.8));
-            shape.setStroke(Color.RED);
+            shape.setFill(Color.TRANSPARENT);
+            shape.setStroke(Color.gray(0.75));
             shape.addEventFilter(MouseEvent.MOUSE_PRESSED, 
                 (MouseEvent mouseEvent) ->
                 {
@@ -369,8 +382,8 @@ public class TopoJsonRenderer
             /**
              * TODO: For Test
              */
-            shape.setFill(Color.gray(0.8));
-            shape.setStroke(Color.RED);
+            shape.setFill(Color.TRANSPARENT);
+            shape.setStroke(Color.gray(0.75));
             shape.addEventFilter(MouseEvent.MOUSE_PRESSED, 
                 (MouseEvent mouseEvent) ->
                 {

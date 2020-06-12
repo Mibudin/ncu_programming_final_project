@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
+
 
 public class TopoJson
 {
@@ -71,6 +73,8 @@ public class TopoJson
         private Vector2D transform_scale;
         private Vector2D transform_translate;
 
+        private Vector2DTransformer outerTransformer;
+
         private Vector<Vector<Vector2I>> arcs;
 
         /**
@@ -84,6 +88,13 @@ public class TopoJson
 
         public TopologyObject(JSONObject topoJson)
         {
+            outerTransformer = 
+                (Vector2D vector2D) ->
+                {
+                    return vector2D;
+                }
+            ;
+
             parseTopologyObject(topoJson);
         }
 
@@ -142,15 +153,15 @@ public class TopoJson
 
         private Vector2D transformPoint(Vector2I point)
         {
-            return new Vector2D(point).zoom(transform_scale).add(transform_translate)
+            return outerTransformer.transform(new Vector2D(point).zoom(transform_scale).add(transform_translate));
                 /**
                  * TODO: For Test
                  */
                 // ;
-                .zoom(new Vector2D(1, -1))
-                .add(new Vector2D(-117.5, 26.7))
+                // .zoom(new Vector2D(1, -1))
+                // .add(new Vector2D(-117.5, 26.7))
                 // ;
-                .zoom(new Vector2D(180, 180));
+                // .zoom(new Vector2D(180, 180));
         }
 
         private Vector<Vector2D> decodeArc(int arcIndex)
@@ -179,6 +190,16 @@ public class TopoJson
         public GeometryObject getObjects()
         {
             return objects;
+        }
+
+        public Vector2DTransformer getVector2DTransformer()
+        {
+            return outerTransformer;
+        }
+
+        public void setVector2DTransformer(Vector2DTransformer outerTransformer)
+        {
+            this.outerTransformer = outerTransformer;
         }
     }
 

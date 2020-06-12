@@ -7,22 +7,37 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import idv.mibudin.cwbApp.core.cwb.CwbApi;
+import idv.mibudin.cwbApp.core.data.InformationElement;
 import idv.mibudin.cwbApp.core.data.TopoJson;
+import idv.mibudin.cwbApp.core.data.Vector2D;
+import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class JavafxApplication extends Application
 {
-    private static final int WIDTH  = 900;
-    private static final int HEIGHT = 900;
+    private static final int WIDTH  = 600;
+    private static final int HEIGHT = 600;
 
     private static final String TITLE = "CWB API DEMO";
     private static final boolean IS_RESIZABLE = false;
@@ -65,11 +80,59 @@ public class JavafxApplication extends Application
         //     }
         // );
 
-        TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData));
+        Vector2DTransformer demoTransformer = 
+            (Vector2D vector2D) ->
+            {
+                return vector2D
+                    .zoom(new Vector2D(1, -1))
+                    .add(new Vector2D(-117.5, 26.7))
+                    .zoom(new Vector2D(300, 300));
+            }
+        ;
 
-        Pane p = new Pane();
-        p.getChildren().addAll(tjr.renderToShapes());
-        Scene s = new Scene(p, WIDTH, HEIGHT);
+        TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData));
+        tjr.getTopoJson().getTopologyObject().setVector2DTransformer(demoTransformer);
+        tjr.cacheArcs();
+
+        // Pane p = new Pane();
+        // p.setStyle("-fx-background-color: transparent;");
+        // p.getChildren().addAll(tjr.renderToShapes());
+
+        // ScrollPane sp = createScrollPane(p);
+        // sp.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        // Rectangle clip = new Rectangle(0, 0, WIDTH, HEIGHT);
+        // sp.setClip(clip);
+
+        // StackPane stp = new StackPane();
+        // stp.setStyle("-fx-background-color: rgba(32, 32, 32, 0.85);" +
+        //         //    "-fx-effect: dropshadow(gaussian, white, 50, 0, 0, 0);" +
+        //            "-fx-background-insets: 0;"
+        // );
+        // stp.getChildren().addAll(sp);
+
+        CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
+        ca.setShouldReturnJson(true);
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("elementName", "TEMP");
+        parameters.put("parameterName", "CITY");
+        JSONObject tempData = new JSONObject(ca.requestDatastore("O-A0001-001", parameters).getResponseContent());
+        JSONArray locations = tempData.getJSONObject("records").getJSONArray("location");
+        Vector<InformationElement> informations = new Vector<InformationElement>();
+        for(int i = 0; i < locations.length(); i++)
+        {
+            JSONObject location = locations.getJSONObject(i);
+            String name = location.getString("locationName");
+            Vector2D loc = new Vector2D(location.getDouble("lon"), location.getDouble("lat"));
+            Vector<Double> values = new Vector<Double>();
+            values.add(location.getJSONArray("weatherElement").getJSONObject(0).getDouble("elementValue"));
+            informations.add(i, new InformationElement(name, loc, values));
+        }
+
+        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(tjr, informations);
+        imp_r.render(WIDTH, HEIGHT, demoTransformer);
+
+        Scene s = new Scene(imp_r, WIDTH, HEIGHT);
+        s.setFill(Color.TRANSPARENT);
         s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
             (MouseEvent mouseEvent) ->
             {
@@ -77,10 +140,30 @@ public class JavafxApplication extends Application
             }
         );
 
+        /**
+         * TODO: For Test
+         */
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+
         primaryStage.setTitle(TITLE);
         primaryStage.setResizable(IS_RESIZABLE);
         primaryStage.centerOnScreen();
         primaryStage.setScene(s);
         primaryStage.show();
     }
+
+    private ScrollPane createScrollPane(Node node) {
+        ScrollPane scroll = new ScrollPane();
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        // scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        // scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scroll.setPannable(true);
+        scroll.setMinSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
+        scroll.setPrefSize(WIDTH, HEIGHT);
+        scroll.setMaxSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
+        scroll.setContent(node);
+        return scroll;
+    }
+
 }

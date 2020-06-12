@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,7 +61,9 @@ public class HttpsConnector
             while(parametersIterator.hasNext())
             {
                 Entry<String, String> parametersPair = parametersIterator.next();
-                requestUrlStringBuilder.append(parametersPair.getKey()).append("=").append(parametersPair.getValue());
+                String key = parametersPair.getKey();
+                String value = parametersPair.getValue();
+                requestUrlStringBuilder.append(URLEncoder.encode(key, StandardCharsets.UTF_8)).append("=").append(URLEncoder.encode(value, StandardCharsets.UTF_8));
                 if(parametersIterator.hasNext())
                 {
                     requestUrlStringBuilder.append("&");
@@ -119,6 +123,6 @@ public class HttpsConnector
         httpsURLConnection.disconnect();
 
         // Return the HTTPS response.
-        return new HttpsResponse(httpsURLConnection.getResponseCode(), httpsURLConnection.getResponseMessage(), inputStringBuilder.toString());
+        return new HttpsResponse(httpsURLConnection.getHeaderFields(), httpsURLConnection.getResponseCode(), httpsURLConnection.getResponseMessage(), inputStringBuilder.toString());
     }
 }

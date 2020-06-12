@@ -37,4 +37,10 @@ public class VectorTools
 
         return changedVector2Ds;
     }
+
+
+    public static interface Vector2DTransformer
+    {
+        public abstract Vector2D transform(Vector2D vector2D);
+    }
 }

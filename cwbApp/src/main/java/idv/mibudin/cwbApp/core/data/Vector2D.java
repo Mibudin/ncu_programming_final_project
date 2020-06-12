@@ -38,6 +38,12 @@ public class Vector2D
         return scale(this, b);
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("[%d, %d]", x, y);
+    }
+
     public double getX()
     {
         return x;

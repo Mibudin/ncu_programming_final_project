@@ -1,5 +1,7 @@
 package idv.mibudin.cwbApp.core.net;
 
+import java.util.List;
+import java.util.Map;
 
 /**
  * The {@code HttpsResponse} class is a simple structure containing the response content
@@ -7,6 +9,10 @@ package idv.mibudin.cwbApp.core.net;
  */
 public class HttpsResponse
 {
+    /**
+     * The response header of the response.
+     */
+    private Map<String, List<String>> responseHeader;
     /**
      * The response code of the response.
      */
@@ -23,15 +29,26 @@ public class HttpsResponse
 
     /**
      * Construct a new {@code httpsResponse}.
+     * @param responseHeader The response header of the response.
      * @param responseCode The response code of the response.
      * @param responseMessage The response massage of the response.
      * @param responseContent The response content of the response.
      */
-    public HttpsResponse(int responseCode, String responseMessage, String responseContent)
+    public HttpsResponse(Map<String, List<String>> responseHeader, int responseCode, String responseMessage, String responseContent)
     {
+        this.responseHeader = responseHeader;
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
         this.responseContent = responseContent;
+    }
+
+    /**
+     * Get the response header of the response.
+     * @return The response header of the response.
+     */
+    public Map<String, List<String>> getResponseHeader()
+    {
+        return responseHeader;
     }
 
     /**
