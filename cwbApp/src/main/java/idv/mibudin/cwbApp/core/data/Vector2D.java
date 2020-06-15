@@ -33,9 +33,19 @@ public class Vector2D
         return sum(this, b);
     }
 
+    public Vector2D add(double bx, double by)
+    {
+        return new Vector2D(x + bx, y + by);
+    }
+
     public Vector2D zoom(Vector2D b)
     {
         return scale(this, b);
+    }
+
+    public Vector2D zoom(double bx, double by)
+    {
+        return new Vector2D(x * bx, y * by);
     }
 
     @Override

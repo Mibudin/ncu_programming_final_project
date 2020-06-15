@@ -28,9 +28,19 @@ public class Vector2I
         return sum(this, b);
     }
 
+    public Vector2I add(int bx, int by)
+    {
+        return new Vector2I(x + bx, y + by);
+    }
+
     public Vector2I zoom(Vector2I b)
     {
         return scale(this, b);
+    }
+
+    public Vector2I zoom(int bx, int by)
+    {
+        return new Vector2I(x * bx, y * by);
     }
 
     @Override

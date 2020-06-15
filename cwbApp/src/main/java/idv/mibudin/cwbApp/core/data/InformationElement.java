@@ -3,6 +3,11 @@ package idv.mibudin.cwbApp.core.data;
 
 import java.util.Vector;
 
+import org.json.JSONObject;
+
+import idv.mibudin.cwbApp.core.data.Information.InformationType;
+import idv.mibudin.cwbApp.core.tool.JsonTools;
+
 
 public class InformationElement
 {
@@ -13,14 +18,29 @@ public class InformationElement
      */
     private Vector2D location;
 
-    private Vector<Double> values;
+    private InformationGroup informationGroup;
 
     
-    public InformationElement(String name, Vector2D location, Vector<Double> values)
+    public InformationElement(String name, Vector2D location, InformationGroup informationGroup)
     {
         this.name = name;
         this.location = location;
-        this.values = values;
+        this.informationGroup = informationGroup;
+    }
+
+    public Information getInformation(InformationType informationType)
+    {
+        return informationGroup.getInformation(informationType);
+    }
+
+    public double getDoubleValue(InformationType informationType)
+    {
+        return informationGroup.getInformation(informationType).getDoubleValue();
+    }
+
+    public String getStringValue(InformationType informationType)
+    {
+        return informationGroup.getInformation(informationType).getStringValue();
     }
 
     public String getName()
@@ -33,8 +53,21 @@ public class InformationElement
         return location;
     }
 
-    public Vector<Double> getValues()
+    public InformationGroup getInformationGroup()
     {
-        return values;
+        return informationGroup;
+    }
+
+    public static InformationElement createInformationElementWithLocation(JSONObject locationJson, String doubleValuePaths, String stringValuePaths)
+    {
+        String name = locationJson.getString("locationName");
+        Vector2D location = new Vector2D(locationJson.getDouble("lon"), locationJson.getDouble("lat"));
+        InformationGroup informationGroup = new InformationGroup();
+        /**
+         * TODO:
+         */
+
+
+        return new InformationElement(name, location, informationGroup);
     }
 }

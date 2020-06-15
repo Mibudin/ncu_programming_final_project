@@ -15,21 +15,28 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import idv.mibudin.cwbApp.core.cwb.CwbApi;
+import idv.mibudin.cwbApp.core.cwb.CwbApiDataID;
+import idv.mibudin.cwbApp.core.data.Information;
 import idv.mibudin.cwbApp.core.data.InformationElement;
+import idv.mibudin.cwbApp.core.data.InformationGroup;
 import idv.mibudin.cwbApp.core.data.TopoJson;
 import idv.mibudin.cwbApp.core.data.Vector2D;
+import idv.mibudin.cwbApp.core.data.Information.InformationType;
 import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -84,15 +91,15 @@ public class JavafxApplication extends Application
             (Vector2D vector2D) ->
             {
                 return vector2D
-                    .zoom(new Vector2D(1, -1))
-                    .add(new Vector2D(-117.5, 26.7))
-                    .zoom(new Vector2D(300, 300));
+                    .zoom(1, -1)
+                    .add(-117.5, 26.7)
+                    .zoom(300, 300);
             }
         ;
 
         TopoJsonRenderer tjr = new TopoJsonRenderer(new TopoJson(mapData));
-        tjr.getTopoJson().getTopologyObject().setVector2DTransformer(demoTransformer);
-        tjr.cacheArcs();
+        // tjr.getTopoJson().getTopologyObject().setVector2DTransformer(demoTransformer);
+        // tjr.cacheArcs();
 
         // Pane p = new Pane();
         // p.setStyle("-fx-background-color: transparent;");
@@ -110,28 +117,57 @@ public class JavafxApplication extends Application
         // );
         // stp.getChildren().addAll(sp);
 
+        // CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
+        // ca.setShouldReturnJson(true);
+        // Map<String, String> parameters = new HashMap<String, String>();
+        // parameters.put("elementName", "HOUR_24");
+        // parameters.put("parameterName", "CITY");
+        // String data = ca.requestDatastore("O-A0002-001", parameters).getResponseContent();
+
         CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
         ca.setShouldReturnJson(true);
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("elementName", "TEMP");
-        parameters.put("parameterName", "CITY");
-        JSONObject tempData = new JSONObject(ca.requestDatastore("O-A0001-001", parameters).getResponseContent());
+        String data = ca.requestDatastore(
+            // CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS,
+            CwbApiDataID.AUTO_WX_STA__WX_OBS,
+            // "elementName", "latest_3days",
+            "elementName", "TEMP",
+            "parameterName", "CITY"
+        ).getResponseContent();
+
+
+        JSONObject tempData = new JSONObject(data);
         JSONArray locations = tempData.getJSONObject("records").getJSONArray("location");
-        Vector<InformationElement> informations = new Vector<InformationElement>();
+        Vector<InformationElement> informations1 = new Vector<InformationElement>();
         for(int i = 0; i < locations.length(); i++)
         {
             JSONObject location = locations.getJSONObject(i);
+
             String name = location.getString("locationName");
             Vector2D loc = new Vector2D(location.getDouble("lon"), location.getDouble("lat"));
-            Vector<Double> values = new Vector<Double>();
-            values.add(location.getJSONArray("weatherElement").getJSONObject(0).getDouble("elementValue"));
-            informations.add(i, new InformationElement(name, loc, values));
+            double value = location.getJSONArray("weatherElement").getJSONObject(0).getDouble("elementValue");
+    
+            InformationGroup ig = new InformationGroup();
+            ig.addInformation(new Information(InformationType.TEMPERATURE, value));
+
+            informations1.add(i, new InformationElement(name, loc, ig));
         }
 
-        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(tjr, informations);
-        imp_r.render(WIDTH, HEIGHT, demoTransformer);
+        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(WIDTH - 100, HEIGHT, demoTransformer, tjr, informations1);
+        imp_r.render();
+        imp_r.renderMap();
+        imp_r.renderInformations(InformationType.TEMPERATURE);
 
-        Scene s = new Scene(imp_r, WIDTH, HEIGHT);
+        Button bt = new Button("Test Button");
+        Pane pTest = new Pane();
+        pTest.setStyle("-fx-background-color: white;");
+        pTest.getChildren().add(bt);
+
+        HBox h = new HBox();
+        h.setStyle("-fx-background-color: transparent;");
+        h.getChildren().addAll(imp_r, pTest);
+
+
+        Scene s = new Scene(h, WIDTH, HEIGHT);
         s.setFill(Color.TRANSPARENT);
         s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
             (MouseEvent mouseEvent) ->
@@ -154,15 +190,20 @@ public class JavafxApplication extends Application
 
     private ScrollPane createScrollPane(Node node) {
         ScrollPane scroll = new ScrollPane();
+
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         // scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         // scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
         scroll.setPannable(true);
+
         scroll.setMinSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
         scroll.setPrefSize(WIDTH, HEIGHT);
         scroll.setMaxSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
+
         scroll.setContent(node);
+
         return scroll;
     }
 

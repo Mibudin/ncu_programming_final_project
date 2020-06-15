@@ -13,7 +13,7 @@ import idv.mibudin.cwbApp.core.net.HttpsResponse;
 
 
 /**
- * The {@code Tester} class is used for testing CwbApplet.
+ * The {@code Tester} class is used for testing CwbApp.
  */
 public class Tester
 {
