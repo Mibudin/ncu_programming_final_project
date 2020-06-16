@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="560.0" prefWidth="960.0" styleClass="transparent-background" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="idv.mibudin.cwbApp.core.gui.controller.ObserveDataController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="transparent-background" HBox.hgrow="NEVER">
+         <center>
+            <Pane fx:id="informationMapRoom" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="520.0" styleClass="transparent-background" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </Pane>
+         </center>
+         <top>
+            <Pane prefHeight="20.0" prefWidth="0.0" styleClass="normal-background" BorderPane.alignment="CENTER" />
+         </top>
+         <left>
+            <Pane prefHeight="0.0" prefWidth="20.0" styleClass="normal-background" BorderPane.alignment="CENTER" />
+         </left>
+         <right>
+            <Pane prefHeight="0.0" prefWidth="20.0" styleClass="normal-background" BorderPane.alignment="CENTER" />
+         </right>
+         <bottom>
+            <Pane prefHeight="20.0" prefWidth="0.0" styleClass="normal-background" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+      <Pane prefHeight="200.0" prefWidth="200.0" styleClass="divider-vertical" />
+      <Pane prefHeight="200.0" prefWidth="200.0" styleClass="normal-background" HBox.hgrow="ALWAYS">
+         <children>
+            <VBox fx:id="informationPanelVBox" prefHeight="560.0" prefWidth="380.0" spacing="10.0" styleClass="normal-background">
+               <children>
+                  <HBox alignment="BOTTOM_LEFT" prefHeight="0.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Label fx:id="locationNameLabel" text="地名">
+                           <font>
+                              <Font size="36.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="regionNameLabel" text="縣市・鄉鎮市">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Pane prefHeight="200.0" prefWidth="200.0">
+                     <styleClass>
+                        <String fx:value="divider-horizontal" />
+                        <String fx:value="whole" />
+                     </styleClass>
+                  </Pane>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="海拔高度：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="elevLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　公尺">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="風向：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="wdirLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　度">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="風速：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="wdsdLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　公尺／秒">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="溫度：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="tempLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　°C">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="相對溼度：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="humdLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="氣壓：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="presLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　百帕">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="日累積雨量：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="h_24rLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　毫米">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="小時最大陣風風速：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="h_fxLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　公尺／秒">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="小時最大陣風風向：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="h_xdLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　度">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="小時最大陣風時間：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="h_fxtLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="本日最高溫：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="d_txLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　°C">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="本日最高溫發生時間：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="d_txtLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="本日最低溫：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="d_tnLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　°C">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="0.0" prefWidth="200.0">
+                     <children>
+                        <Label text="本日最低溫發生時間：　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="d_tntLabel">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="　">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="30.0" left="20.0" right="20.0" top="30.0" />
+               </padding>
+            </VBox>
+         </children>
+      </Pane>
+   </children>
+</HBox>

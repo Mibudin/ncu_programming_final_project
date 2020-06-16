@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import idv.mibudin.cwbApp.core.cwb.CwbApi;
-import idv.mibudin.cwbApp.core.gui.JavafxApplication;
+import idv.mibudin.cwbApp.core.gui.JavafxApp;
 import idv.mibudin.cwbApp.core.net.HttpsConnector;
 import idv.mibudin.cwbApp.core.net.HttpsResponse;
 
@@ -31,7 +31,7 @@ public class Tester
             System.out.println(value);
         }
 
-        JavafxApplication.launchJavafxApplication(args);
+        JavafxApp.launchJavafxApplication(args);
     }
 
     private static void cwbApiTest()

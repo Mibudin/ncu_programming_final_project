@@ -19,6 +19,16 @@ public class ValueTools
 
     public static class Cwb
     {
+        public static boolean isValidTempValue(double temp)
+        {
+            if(temp == -99 || temp == -999)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static boolean isValidRainfallValue(double rainfall)
         {
             if(rainfall == -99.0)
@@ -47,6 +57,11 @@ public class ValueTools
         public static Color getDefaultInvalidColor()
         {
             return Color.rgb(0, 0, 0);
+        }
+
+        public static Color getTempColor()
+        {
+            return Color.rgb(255, 255, 255);
         }
 
         public static Color getRainfallColorSmallSpacing(double rainfall)

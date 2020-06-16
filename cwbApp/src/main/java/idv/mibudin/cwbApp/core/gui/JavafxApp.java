@@ -14,6 +14,7 @@ import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import idv.mibudin.cwbApp.App;
 import idv.mibudin.cwbApp.core.cwb.CwbApi;
 import idv.mibudin.cwbApp.core.cwb.CwbApiDataID;
 import idv.mibudin.cwbApp.core.data.Information;
@@ -24,6 +25,8 @@ import idv.mibudin.cwbApp.core.data.Vector2D;
 import idv.mibudin.cwbApp.core.data.Information.InformationType;
 import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -41,24 +44,45 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 
-public class JavafxApplication extends Application
+public class JavafxApp extends Application
 {
-    private static final int WIDTH  = 600;
-    private static final int HEIGHT = 600;
+    public static final double WINDOW_WIDTH  = 1020;  // 960, Shadow: + 30 * 2
+    public static final double WINDOW_HEIGHT =  690;  // 600, Shadow: + 30 * 2, Title Bar: + 30
 
-    private static final String TITLE = "CWB API DEMO";
-    private static final boolean IS_RESIZABLE = false;
+    public static final double SCREEN_WIDTH  = 960;
+    public static final double SCREEN_HEIGHT = 600;
+
+    public static final double TAB_WIDTH  = 960;
+    public static final double TAB_HEIGHT = 560;
+
+    public static final String TITLE = "CWB API DEMO";
+
+    public static final boolean IS_HI_DPI = true;
+    public static final boolean IS_RESIZABLE = false;
+
+
+    private Stage mainStage;
 
 
     public static void launchJavafxApplication(String[] args)
     {
-        System.setProperty("prism.allowhidpi", "false");
+        System.setProperty("prism.allowhidpi", IS_HI_DPI ? "true" : "false");
 
-        Application.launch(JavafxApplication.class, args);
+        Application.launch(JavafxApp.class, args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception
+    {
+        App.setJavafxApp(this);
+
+        mainStage = primaryStage;
+
+        // test();
+        test2();
+    }
+
+    public Pane test() throws Exception
     {
         // FileInputStream fis = new FileInputStream("CwbApplet/res/informationMap/COUNTY_MOI_1081121 (2).json");
         // FileReader fr = new FileReader("D:/Workspaces/ncu_programming_final_project/res/informationMap/COUNTY_MOI_1081121 (2).json");
@@ -87,13 +111,15 @@ public class JavafxApplication extends Application
         //     }
         // );
 
-        Vector2DTransformer demoTransformer = 
+        // lon / lat ~ 101751 / 110751 (in Nantou)
+        Vector2DTransformer demoMapTransformer = 
             (Vector2D vector2D) ->
             {
                 return vector2D
                     .zoom(1, -1)
                     .add(-117.5, 26.7)
-                    .zoom(300, 300);
+                    .zoom(1, 110751.0 / 101751.0)
+                    .zoom(200, 200);
             }
         ;
 
@@ -127,11 +153,11 @@ public class JavafxApplication extends Application
         CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
         ca.setShouldReturnJson(true);
         String data = ca.requestDatastore(
-            // CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS,
-            CwbApiDataID.AUTO_WX_STA__WX_OBS,
-            // "elementName", "latest_3days",
-            "elementName", "TEMP",
-            "parameterName", "CITY"
+            // CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS
+            CwbApiDataID.AUTO_WX_STA__WX_OBS
+            // "elementName", "HOUR_24"
+            // "elementName", "TEMP"
+            // "parameterName", "CITY"
         ).getResponseContent();
 
 
@@ -147,15 +173,17 @@ public class JavafxApplication extends Application
             double value = location.getJSONArray("weatherElement").getJSONObject(0).getDouble("elementValue");
     
             InformationGroup ig = new InformationGroup();
-            ig.addInformation(new Information(InformationType.TEMPERATURE, value));
+            ig.addInformation(new Information(InformationType.H_24R, value));
 
             informations1.add(i, new InformationElement(name, loc, ig));
         }
 
-        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(WIDTH - 100, HEIGHT, demoTransformer, tjr, informations1);
+        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(520, 520, demoMapTransformer, tjr, informations1);
+        imp_r.setMinInnerWidth(1000);
+        imp_r.setMinInnerHeight(1500);
         imp_r.render();
         imp_r.renderMap();
-        imp_r.renderInformations(InformationType.TEMPERATURE);
+        imp_r.renderInformations(InformationType.H_24R, locations);
 
         Button bt = new Button("Test Button");
         Pane pTest = new Pane();
@@ -166,9 +194,36 @@ public class JavafxApplication extends Application
         h.setStyle("-fx-background-color: transparent;");
         h.getChildren().addAll(imp_r, pTest);
 
+        // return h;
+        return imp_r;
 
-        Scene s = new Scene(h, WIDTH, HEIGHT);
+
+        // Scene s = new Scene(h, WINDOW_WIDTH, WINDOW_HEIGHT);
+        // s.setFill(Color.TRANSPARENT);
+        // s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
+        //     (MouseEvent mouseEvent) ->
+        //     {
+        //         System.out.println("> (" + mouseEvent.getX() + ", " + mouseEvent.getY() + ")");
+        //     }
+        // );
+
+        // /**
+        //  * TODO: For Test
+        //  */
+        // mainStage.initStyle(StageStyle.TRANSPARENT);
+
+        // mainStage.setTitle(TITLE);
+        // mainStage.setResizable(IS_RESIZABLE);
+        // mainStage.centerOnScreen();
+        // mainStage.setScene(s);
+        // mainStage.show();
+    }
+
+    private void test2() throws Exception
+    {
+        Scene s = new Scene(new FXMLLoader(App.class.getResource("fxml/MainScene.fxml")).load(), WINDOW_WIDTH, WINDOW_HEIGHT);
         s.setFill(Color.TRANSPARENT);
+        s.getStylesheets().add(App.class.getResource("css/defaultStyle.css").toExternalForm());
         s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
             (MouseEvent mouseEvent) ->
             {
@@ -179,32 +234,17 @@ public class JavafxApplication extends Application
         /**
          * TODO: For Test
          */
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        mainStage.initStyle(StageStyle.TRANSPARENT);
 
-        primaryStage.setTitle(TITLE);
-        primaryStage.setResizable(IS_RESIZABLE);
-        primaryStage.centerOnScreen();
-        primaryStage.setScene(s);
-        primaryStage.show();
+        mainStage.setTitle(TITLE);
+        mainStage.setResizable(IS_RESIZABLE);
+        mainStage.centerOnScreen();
+        mainStage.setScene(s);
+        mainStage.show();
     }
 
-    private ScrollPane createScrollPane(Node node) {
-        ScrollPane scroll = new ScrollPane();
-
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        // scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        // scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        scroll.setPannable(true);
-
-        scroll.setMinSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
-        scroll.setPrefSize(WIDTH, HEIGHT);
-        scroll.setMaxSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
-
-        scroll.setContent(node);
-
-        return scroll;
+    public Stage getMainStage()
+    {
+        return mainStage;
     }
-
 }

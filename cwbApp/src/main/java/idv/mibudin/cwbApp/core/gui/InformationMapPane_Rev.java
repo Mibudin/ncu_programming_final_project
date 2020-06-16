@@ -3,11 +3,14 @@ package idv.mibudin.cwbApp.core.gui;
 
 import java.util.Vector;
 
+import org.json.JSONArray;
+
 import idv.mibudin.cwbApp.core.data.Information;
 import idv.mibudin.cwbApp.core.data.InformationElement;
 import idv.mibudin.cwbApp.core.data.TopoJson;
 import idv.mibudin.cwbApp.core.data.Vector2D;
 import idv.mibudin.cwbApp.core.data.Information.InformationType;
+import idv.mibudin.cwbApp.core.gui.controller.ObserveDataController;
 import idv.mibudin.cwbApp.core.tool.ValueTools;
 import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.beans.property.DoubleProperty;
@@ -29,9 +32,15 @@ import javafx.scene.transform.Translate;
 
 public class InformationMapPane_Rev extends StackPane
 {
+    private static final String STYLE_CLASS_NAME = "information-map-pane-rev";
+    private static final String MAP_PANE_STYLE_CLASS_NAME = "map-pane";
+
     private double width;
     private double height;
     private Vector2DTransformer outerTransformer;
+
+    private double minInnerWidth;
+    private double minInnerHeight;
 
     private TopoJsonRenderer mapTopoJsonRenderer;
     private Vector<InformationElement> informationElements;
@@ -48,11 +57,18 @@ public class InformationMapPane_Rev extends StackPane
         this.height = height;
         this.outerTransformer = outerTransformer;
 
+        this.minInnerWidth = this.width;
+        this.minInnerHeight = this.height;
+
         this.mapTopoJsonRenderer = mapTopoJsonRenderer;
         this.informationElements = informationElements;
 
+        this.getStyleClass().add(STYLE_CLASS_NAME);
+
         mapPane = new Pane();
         informationsPane = new Pane();
+
+        mapPane.getStyleClass().add(MAP_PANE_STYLE_CLASS_NAME);
     }
 
     public void render()
@@ -70,14 +86,14 @@ public class InformationMapPane_Rev extends StackPane
         // double width = mapPane.getBoundsInLocal().getWidth();
         // double height = mapPane.getBoundsInLocal().getHeight();
         ScrollPane mapScrollPane = createScrollPane(p, width, height);
-        mapScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        // mapScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         mapScrollPane.setClip(new Rectangle(0, 0, width, height));
 
 
-        setStyle("-fx-background-color: rgba(32, 32, 32, 0.85);" +
-                //    "-fx-effect: dropshadow(gaussian, white, 50, 0, 0, 0);" +
-                   "-fx-background-insets: 0;"
-        );
+        // setStyle("-fx-background-color: rgba(32, 32, 32, 0.85);" +
+        //         //    "-fx-effect: dropshadow(gaussian, white, 50, 0, 0, 0);" +
+        //            "-fx-background-insets: 0;"
+        // );
         getChildren().setAll(
             // renderMap(width, height),
             // renderInformations(width, height)
@@ -91,20 +107,27 @@ public class InformationMapPane_Rev extends StackPane
          * TODO: For Test
          */
 
+        mapPane.setMinWidth(minInnerWidth);
+        mapPane.setMinHeight(minInnerHeight);
+
         mapTopoJsonRenderer.getTopoJson().getTopologyObject().setVector2DTransformer(outerTransformer);
         mapTopoJsonRenderer.cacheArcs();
 
         // Pane mapPane = new Pane();
-        mapPane.setStyle("-fx-background-color: transparent;");
+        // mapPane.setStyle("-fx-background-color: transparent;");
         mapPane.getChildren().addAll(mapTopoJsonRenderer.renderToShapes());
 
         // return mapPane;
     }
 
-    public void renderInformations(InformationType informationType)
+    public void renderInformations(InformationType informationType, JSONArray locations)
     {
         // Pane informationsPane = new Pane();
         // informationsPane.setMouseTransparent(true);
+
+        informationsPane.setMinWidth(minInnerWidth);
+        informationsPane.setMinHeight(minInnerHeight);
+
         for(InformationElement informationElement : informationElements)
         {
             Vector2D realCoodinate = outerTransformer.transform(informationElement.getLocation());
@@ -115,7 +138,8 @@ public class InformationMapPane_Rev extends StackPane
             /**
              * TODO: For Test
              */
-            Rectangle informationIcon = new Rectangle(realCoodinate.getX() - 4, realCoodinate.getY() - 4, 8, 8);
+            double rectangleSize = 6;
+            Rectangle informationIcon = new Rectangle(realCoodinate.getX() - rectangleSize / 2, realCoodinate.getY() - rectangleSize / 2, rectangleSize, rectangleSize);
             informationIcon.setStroke(Color.TRANSPARENT);
             informationIcon.setStrokeWidth(2);
 
@@ -130,7 +154,7 @@ public class InformationMapPane_Rev extends StackPane
             else
             {
                 System.out.println("> Invalid value: " + informationElement.getName() + ", " + information.getDoubleValue());
-                informationIcon.setFill(Color.RED);
+                informationIcon.setFill(ValueTools.Cwb.getDefaultInvalidColor());
             }
 
             /**
@@ -140,6 +164,7 @@ public class InformationMapPane_Rev extends StackPane
                 (MouseEvent mouseEvent) ->
                 {
                     System.out.println("> " + informationElement.getName() + ", " + information.getDoubleValue());
+                    ObserveDataController.getInstance().showInformationPanel(locations.getJSONObject(informationElements.indexOf(informationElement)));
                 }
             );
             informationIcon.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET,
@@ -171,13 +196,23 @@ public class InformationMapPane_Rev extends StackPane
         this.outerTransformer = outerTransformer;
     }
 
+    public void setMinInnerWidth(double minInnerWidth)
+    {
+        this.minInnerWidth = minInnerWidth;
+    }
+
+    public void setMinInnerHeight(double minInnerHeight)
+    {
+        this.minInnerHeight = minInnerHeight;
+    }
+
     private static ScrollPane createScrollPane(Node node, double width, double height)
     {
         ScrollPane scroll = new ScrollPane();
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        // scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        // scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        // scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        // scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scroll.setPannable(true);
         scroll.setMinSize(ScrollPane.USE_PREF_SIZE, ScrollPane.USE_PREF_SIZE);
         scroll.setPrefSize(width, height);

@@ -213,6 +213,8 @@ public class TopoJson
 
         private static GeometryObject createGeometryObject(JSONObject geometryObjectJson)
         {
+            // System.out.println(geometryObjectJson.getString("type"));
+            // System.out.println(getTypeByClassName(geometryObjectJson.getString("type")));
             switch(getTypeByClassName(geometryObjectJson.getString("type")))
             {
                 case GEOMETRY_COLLECTION:
