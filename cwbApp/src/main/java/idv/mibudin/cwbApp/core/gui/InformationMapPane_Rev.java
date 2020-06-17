@@ -4,6 +4,7 @@ package idv.mibudin.cwbApp.core.gui;
 import java.util.Vector;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import idv.mibudin.cwbApp.core.data.Information;
 import idv.mibudin.cwbApp.core.data.InformationElement;
@@ -22,6 +23,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.transform.Rotate;
@@ -106,6 +108,7 @@ public class InformationMapPane_Rev extends StackPane
         /**
          * TODO: For Test
          */
+        mapPane.getChildren().clear();
 
         mapPane.setMinWidth(minInnerWidth);
         mapPane.setMinHeight(minInnerHeight);
@@ -125,11 +128,15 @@ public class InformationMapPane_Rev extends StackPane
         // Pane informationsPane = new Pane();
         // informationsPane.setMouseTransparent(true);
 
+        informationsPane.getChildren().clear();
+
         informationsPane.setMinWidth(minInnerWidth);
         informationsPane.setMinHeight(minInnerHeight);
 
         for(InformationElement informationElement : informationElements)
         {
+            JSONObject location = locations.getJSONObject(informationElements.indexOf(informationElement));
+
             Vector2D realCoodinate = outerTransformer.transform(informationElement.getLocation());
                 // .zoom(new Vector2D(1, -1))
                 // .add(new Vector2D(-117.5, 26.7))
@@ -138,8 +145,43 @@ public class InformationMapPane_Rev extends StackPane
             /**
              * TODO: For Test
              */
-            double rectangleSize = 6;
-            Rectangle informationIcon = new Rectangle(realCoodinate.getX() - rectangleSize / 2, realCoodinate.getY() - rectangleSize / 2, rectangleSize, rectangleSize);
+            Shape informationIcon;
+
+            if(informationType == InformationType.WDIR || informationType == InformationType.WDSD
+            || informationType == InformationType.H_FX || informationType == InformationType.H_XD)
+            {
+                double[] points = {
+                     0.0,  5.0,
+                    -4.0, -5.0,
+                     0.0, -3.0,
+                     4.0, -5.0
+                };
+                for(int i = 0; i < points.length / 2; i++)
+                {
+                    points[2 * i    ] += realCoodinate.getX();
+                    points[2 * i + 1] += realCoodinate.getY(); 
+                }
+                informationIcon = new Polygon(points);
+
+                double dir = 0;
+                if(informationType == InformationType.WDIR || informationType == InformationType.WDSD)
+                {
+                    dir = location.getJSONArray("weatherElement").getJSONObject(InformationType.getInformationIndex(InformationType.WDIR)).getDouble("elementValue");
+                    
+                }
+                else if(informationType == InformationType.H_FX || informationType == InformationType.H_XD)
+                {
+                    dir = location.getJSONArray("weatherElement").getJSONObject(InformationType.getInformationIndex(InformationType.H_XD)).getDouble("elementValue");
+                }
+                informationIcon.getTransforms().add(Transform.rotate(dir, realCoodinate.getX(), realCoodinate.getY()));
+            }
+            else
+            {
+                double rectangleSize = 6;
+                informationIcon = new Rectangle(realCoodinate.getX() - rectangleSize / 2, realCoodinate.getY() - rectangleSize / 2, rectangleSize, rectangleSize);
+            }
+
+
             informationIcon.setStroke(Color.TRANSPARENT);
             informationIcon.setStrokeWidth(2);
 
@@ -160,11 +202,11 @@ public class InformationMapPane_Rev extends StackPane
             /**
              * TODO: For Test
              */
-            informationIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, 
+            informationIcon.addEventFilter(MouseEvent.MOUSE_CLICKED, 
                 (MouseEvent mouseEvent) ->
                 {
                     System.out.println("> " + informationElement.getName() + ", " + information.getDoubleValue());
-                    ObserveDataController.getInstance().showInformationPanel(locations.getJSONObject(informationElements.indexOf(informationElement)));
+                    ObserveDataController.getInstance().showInformationPanel(location);
                 }
             );
             informationIcon.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET,

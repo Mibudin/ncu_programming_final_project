@@ -21,6 +21,7 @@ public class Tester
     {
         javafxAppTest(args);
         // cwbApiTest();
+        // httpsTest2();
     }
 
     private static void javafxAppTest(String[] args)
@@ -43,6 +44,20 @@ public class Tester
         parameters.put("limit", "3");
 
         System.out.println(ca.requestDatastore("O-A0003-001", parameters).getResponseContent());
+    }
+
+    private static void httpsTest2()
+    {
+        // https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/O-A0059-001?Authorization=rdec-key-123-45678-011121314&format=JSON
+        try
+        {
+            HttpsResponse res = HttpsConnector.httpsRequest("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/O-A0059-001?Authorization=rdec-key-123-45678-011121314&format=JSON", "GET", null, null, null);
+            System.out.println(res.getResponseContent());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private static void httpsTest()

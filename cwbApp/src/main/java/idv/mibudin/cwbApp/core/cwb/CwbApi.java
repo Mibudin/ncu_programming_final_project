@@ -11,6 +11,8 @@ import idv.mibudin.cwbApp.core.net.HttpsResponse;
 
 public class CwbApi
 {
+    public static final String DEFAULT_AUTHORIZATION_KEY = "CWB-D3AA9928-023B-4902-BBAB-55FB9A448508";
+
     private static final String DATASET_URL   = "https://opendata.cwb.gov.tw/api/v1/rest/dataset/";
     private static final String DATASTORE_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/";
 

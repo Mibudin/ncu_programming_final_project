@@ -130,6 +130,23 @@
 }
 
 
+.choice-box
+{
+    -fx-background-color: #0a0a0a;
+}
+.choice-box:hover
+{
+    -fx-background-color: #10165F;
+}
+.choice-box:pressed
+{
+    -fx-background-color: #1620A1;
+}
+.choice-box:focus
+{
+    -fx-background-color: #1620A1;
+}
+
 .tab-header-area
 {
     -fx-pref-height: 40px;
@@ -152,7 +169,7 @@
 {
     -fx-background-color : #10165F;
 }
-.tab:selected
+.tab:focused
 {
     -fx-background-color : #1620A1;
 }

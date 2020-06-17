@@ -86,20 +86,20 @@ public class Information
     {
         switch(type)
         {
-            case  ELEV: return ValueTools.Cwb.getTempColor();
-            case  WDIR: return ValueTools.Cwb.getTempColor();
-            case  WDSD: return ValueTools.Cwb.getTempColor();
+            case  ELEV: return ValueTools.Cwb.getAltitudeColor(doubleValue);
+            case  WDIR: return ValueTools.Cwb.getDirectionColor(doubleValue);
+            case  WDSD: return ValueTools.Cwb.getWindSpeedColor(doubleValue);
             case  TEMP: return ValueTools.Cwb.getTempatureColor(doubleValue);
-            case  HUMD: return ValueTools.Cwb.getTempColor();
-            case  PRES: return ValueTools.Cwb.getTempColor();
+            case  HUMD: return ValueTools.Cwb.getHumidityColor(doubleValue);
+            case  PRES: return ValueTools.Cwb.getPressureColor(doubleValue);
             case H_24R: return ValueTools.Cwb.getRainfallColorSmallSpacing(doubleValue);
-            case  H_FX: return ValueTools.Cwb.getTempColor();
-            case  H_XD: return ValueTools.Cwb.getTempColor();
-            case H_FXT: return ValueTools.Cwb.getTempColor();
-            case  D_TX: return ValueTools.Cwb.getTempColor();
-            case D_TXT: return ValueTools.Cwb.getTempColor();
-            case  D_TN: return ValueTools.Cwb.getTempColor();
-            case D_TNT: return ValueTools.Cwb.getTempColor();
+            case  H_FX: return ValueTools.Cwb.getWindSpeedColor(doubleValue);
+            case  H_XD: return ValueTools.Cwb.getDirectionColor(doubleValue);
+            case H_FXT: return ValueTools.Cwb.getTempColor();  // Should be no defined color.
+            case  D_TX: return ValueTools.Cwb.getTempatureColor(doubleValue);
+            case D_TXT: return ValueTools.Cwb.getTempColor();  // Should be no defined color.
+            case  D_TN: return ValueTools.Cwb.getTempatureColor(doubleValue);
+            case D_TNT: return ValueTools.Cwb.getTempColor();  // Should be no defined color.
             default:    return ValueTools.Cwb.getDefaultInvalidColor();
         }
     }

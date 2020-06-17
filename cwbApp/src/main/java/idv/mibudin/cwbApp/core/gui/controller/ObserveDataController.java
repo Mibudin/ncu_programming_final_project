@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -29,7 +30,10 @@ import idv.mibudin.cwbApp.core.tool.ResourceLoader;
 import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -40,8 +44,11 @@ public class ObserveDataController implements Initializable
 {
     private static ObserveDataController instance;
 
+    private InformationMapPane_Rev informationMapPane;
     private TopoJsonRenderer topoJsonRenderer;
-    private JSONObject informationData;
+    private JSONObject informationData1;
+    private JSONObject informationData2;
+    private JSONArray locations;
 
     private static final Vector2DTransformer MAP_TRANSFORMER = 
         (Vector2D vector2D) ->
@@ -77,6 +84,8 @@ public class ObserveDataController implements Initializable
     @FXML private Label  d_tnLabel;
     @FXML private Label d_tntLabel;
 
+    @FXML private ChoiceBox<String> typeChoiceBox;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources)
@@ -86,9 +95,50 @@ public class ObserveDataController implements Initializable
         loadInformationMap();
         loadInformations();
         
-        informationMapRoom.getChildren().add(renderInformationMapPane(InformationType.TEMP));
+        informationMapRoom.getChildren().setAll(renderInformationMapPane(InformationType.TEMP));
 
         informationPanelVBox.setVisible(false);
+
+        typeChoiceBox.getItems().addAll(
+            "海拔高度",
+            "風向",
+            "風速",
+            "溫度",
+            "相對溼度",
+            "氣壓",
+            "日累積雨量",
+            "小時最大陣風風速",
+            "小時最大陣風風向",
+            "本日最高溫",
+            "本日最低溫"
+        );
+        typeChoiceBox.setValue("溫度");
+    }
+
+    @FXML
+    private void onMouseClickedTypeButton(MouseEvent mouseEvent)
+    {
+
+        String typeString = (String)typeChoiceBox.getValue();
+        InformationType type;
+        switch(typeString)
+        {
+            case        "海拔高度": type = InformationType.ELEV; break;
+            case           "風向": type = InformationType.WDIR; break;
+            case           "風速": type = InformationType.WDSD; break;
+            case           "溫度": type = InformationType.TEMP; break;
+            case        "相對溼度": type = InformationType.HUMD; break;
+            case           "氣壓": type = InformationType.PRES; break;
+            case      "日累積雨量": type = InformationType.H_24R; break;
+            case "小時最大陣風風速": type = InformationType.H_FX; break;
+            case "小時最大陣風風向": type = InformationType.H_XD; break;
+            case      "本日最高溫": type = InformationType.D_TX; break;
+            case      "本日最低溫": type = InformationType.D_TN; break;
+            default:              type = InformationType.ELEV;
+        }
+
+        informationMapPane.setInformationElements(informationDataToInformations(locations, type));
+        informationMapPane.renderInformations(type, locations);
     }
 
     private void loadInformationMap()
@@ -99,42 +149,42 @@ public class ObserveDataController implements Initializable
 
     private void loadInformations()
     {
-        CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
+        CwbApi ca = new CwbApi(CwbApi.DEFAULT_AUTHORIZATION_KEY);
         ca.setShouldReturnJson(true);
-        String data = ca.requestDatastore(
+
+        String data1 = ca.requestDatastore(
             // CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS
             CwbApiDataID.AUTO_WX_STA__WX_OBS
         ).getResponseContent();
 
-        informationData = new JSONObject(data);
+        informationData1 = new JSONObject(data1);
+
+        String data2 = ca.requestDatastore(
+            CwbApiDataID.BUR_WX_STA__WX_OBS,
+            "elementName", "TIME,ELEV,WDIR,WDSD,TEMP,HUMD,PRES,24R,H_FX,H_XD,H_FXT,D_TX,D_TXT,D_TN,D_TNT"
+        ).getResponseContent();
+
+        informationData2 = new JSONObject(data2);
     }
 
     private InformationMapPane_Rev renderInformationMapPane(InformationType type)
     {
-        JSONArray locations = informationData.getJSONObject("records").getJSONArray("location");
-        Vector<InformationElement> informations = new Vector<InformationElement>();
-        for(int i = 0; i < locations.length(); i++)
-        {
-            JSONObject location = locations.getJSONObject(i);
+        JSONArray locations1 = informationData1.getJSONObject("records").getJSONArray("location");
+        JSONArray locations2 = informationData2.getJSONObject("records").getJSONArray("location");
+        List<Object> locationsList =  locations1.toList();
+        locationsList.addAll(locations2.toList());
+        locations = new JSONArray(locationsList);
 
-            String name = location.getString("locationName");
-            Vector2D loc = new Vector2D(location.getDouble("lon"), location.getDouble("lat"));
-            double value = location.getJSONArray("weatherElement").getJSONObject(Information.InformationType.getInformationIndex(type)).getDouble("elementValue");
-    
-            InformationGroup ig = new InformationGroup();
-            ig.addInformation(new Information(type, value));
+        Vector<InformationElement> informations = informationDataToInformations(locations, type);
 
-            informations.add(i, new InformationElement(name, loc, ig));
-        }
+        informationMapPane = new InformationMapPane_Rev(520, 520, MAP_TRANSFORMER, topoJsonRenderer, informations);
+        informationMapPane.setMinInnerWidth(1000);
+        informationMapPane.setMinInnerHeight(1000);
+        informationMapPane.render();
+        informationMapPane.renderMap();
+        informationMapPane.renderInformations(type, locations);
 
-        InformationMapPane_Rev imp_r = new InformationMapPane_Rev(520, 520, MAP_TRANSFORMER, topoJsonRenderer, informations);
-        imp_r.setMinInnerWidth(1000);
-        imp_r.setMinInnerHeight(1500);
-        imp_r.render();
-        imp_r.renderMap();
-        imp_r.renderInformations(type, locations);
-
-        return imp_r;
+        return informationMapPane;
     }
 
     public void showInformationPanel(JSONObject location)
@@ -162,6 +212,26 @@ public class ObserveDataController implements Initializable
         setLabelData(d_tntLabel, location.getJSONArray("weatherElement").getJSONObject(13).getString("elementValue"));
 
         informationPanelVBox.setVisible(true);
+    }
+
+    private static Vector<InformationElement> informationDataToInformations(JSONArray locations, InformationType type)
+    {
+        Vector<InformationElement> informations = new Vector<InformationElement>();
+        for(int i = 0; i < locations.length(); i++)
+        {
+            JSONObject location = locations.getJSONObject(i);
+
+            String name = location.getString("locationName");
+            Vector2D loc = new Vector2D(location.getDouble("lon"), location.getDouble("lat"));
+            double value = location.getJSONArray("weatherElement").getJSONObject(Information.InformationType.getInformationIndex(type)).getDouble("elementValue");
+    
+            InformationGroup ig = new InformationGroup();
+            ig.addInformation(new Information(type, value));
+
+            informations.add(i, new InformationElement(name, loc, ig));
+        }
+
+        return informations;
     }
 
     private static void setLabelData(Label label, String value)
