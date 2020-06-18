@@ -10,7 +10,7 @@ public class SceneManager
 {
     public static Scene mainScene;
 
-    public static Parent _homePage;
+    public static Parent _forecastData;
     public static Parent _observeData;
 
 
@@ -23,7 +23,7 @@ public class SceneManager
     {
         mainScene = new Scene(ResourceLoader.loadFXML("MainScene"));
 
-        _homePage = ResourceLoader.loadFXML("_HomePage");
+        _forecastData = ResourceLoader.loadFXML("_ForecastData");
         _observeData = ResourceLoader.loadFXML("_ObserveData");
     }
 }

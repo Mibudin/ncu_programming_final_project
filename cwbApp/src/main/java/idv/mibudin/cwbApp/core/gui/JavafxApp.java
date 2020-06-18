@@ -224,12 +224,12 @@ public class JavafxApp extends Application
         Scene s = new Scene(new FXMLLoader(App.class.getResource("fxml/MainScene.fxml")).load(), WINDOW_WIDTH, WINDOW_HEIGHT);
         s.setFill(Color.TRANSPARENT);
         s.getStylesheets().add(App.class.getResource("css/defaultStyle.css").toExternalForm());
-        s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
-            (MouseEvent mouseEvent) ->
-            {
-                System.out.println("> (" + mouseEvent.getX() + ", " + mouseEvent.getY() + ")");
-            }
-        );
+        // s.addEventFilter(MouseEvent.MOUSE_PRESSED, 
+        //     (MouseEvent mouseEvent) ->
+        //     {
+        //         System.out.println("> (" + mouseEvent.getX() + ", " + mouseEvent.getY() + ")");
+        //     }
+        // );
 
         /**
          * TODO: For Test

@@ -11,55 +11,22 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <BorderPane id="base-pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="690.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="idv.mibudin.cwbApp.core.gui.controller.MainSceneController">
-   <top>
-      <ButtonBar id="title-bar" fx:id="titleBar" buttonMinWidth="20.0" prefHeight="30.0" prefWidth="200.0">
-        <buttons>
-            <StackPane prefHeight="0.0" prefWidth="0.0">
-               <children>
-                  <Button fx:id="iconifiyScreenButton" maxHeight="20.0" maxWidth="20.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" onMouseClicked="#onMouseClickIconifiyScreenButton" prefHeight="20.0" prefWidth="20.0" />
-                  <ImageView fitHeight="20.0" fitWidth="20.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/baseline_minimize_white_96dp.png" />
-                     </image>
-                     <viewport>
-                        <Rectangle2D />
-                     </viewport>
-                  </ImageView>
-               </children>
-            </StackPane>
-            <StackPane prefHeight="0.0" prefWidth="0.0">
-               <children>
-                <Button fx:id="closeScreenButton" maxHeight="20.0" maxWidth="20.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" onMouseClicked="#onMouseClickCloseScreenButton" prefHeight="20.0" prefWidth="20.0" styleClass="red-button" />
-                  <ImageView fitHeight="20.0" fitWidth="20.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
-                     <image>
-                        <Image url="@../image/baseline_close_white_96dp.png" />
-                     </image>
-                     <viewport>
-                        <Rectangle2D />
-                     </viewport>
-                  </ImageView>
-               </children>
-            </StackPane>
-        </buttons>
-         <padding>
-            <Insets bottom="5.0" left="7.0" right="7.0" top="5.0" />
-         </padding>
-      </ButtonBar>
-   </top>
    <center>
       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="25.0" BorderPane.alignment="CENTER">
         <tabs>
-          <Tab fx:id="homePageTab" text="首頁">
-               <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-               </content>
-          </Tab>
           <Tab fx:id="observeDataTab" text="觀測">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
+          </Tab>
+          <Tab fx:id="homePageTab" text="預測">
+               <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
           </Tab>
             <Tab fx:id="radarDataTab" text="雷達回波">
                <content>
@@ -69,4 +36,48 @@
         </tabs>
       </TabPane>
    </center>
+   <top>
+      <StackPane prefHeight="0.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ButtonBar id="title-bar" fx:id="titleBar" buttonMinWidth="20.0" prefHeight="30.0" prefWidth="200.0">
+               <buttons>
+                  <StackPane maxHeight="0.0" maxWidth="0.0" prefHeight="0.0" prefWidth="0.0">
+                     <children>
+                        <Button fx:id="iconifiyScreenButton" maxHeight="20.0" maxWidth="20.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" onMouseClicked="#onMouseClickIconifiyScreenButton" prefHeight="20.0" prefWidth="20.0" />
+                        <ImageView fitHeight="20.0" fitWidth="20.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../image/baseline_minimize_white_96dp.png" />
+                           </image>
+                           <viewport>
+                              <Rectangle2D />
+                           </viewport>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+                  <StackPane maxHeight="0.0" maxWidth="0.0" prefHeight="0.0" prefWidth="0.0">
+                     <children>
+                        <Button fx:id="closeScreenButton" maxHeight="20.0" maxWidth="20.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" onMouseClicked="#onMouseClickCloseScreenButton" prefHeight="20.0" prefWidth="20.0" styleClass="red-button" />
+                        <ImageView fitHeight="20.0" fitWidth="20.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../image/baseline_close_white_96dp.png" />
+                           </image>
+                           <viewport>
+                              <Rectangle2D />
+                           </viewport>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+               </buttons>
+               <padding>
+                  <Insets bottom="5.0" left="7.0" right="7.0" top="5.0" />
+               </padding>
+            </ButtonBar>
+            <Text fill="#e5e5e5" mouseTransparent="true" strokeType="OUTSIDE" strokeWidth="0.0" text="CWB Weather App" StackPane.alignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+         </children>
+      </StackPane>
+   </top>
 </BorderPane>

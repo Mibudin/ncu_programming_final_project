@@ -48,18 +48,23 @@ public class ObserveDataController implements Initializable
     private TopoJsonRenderer topoJsonRenderer;
     private JSONObject informationData1;
     private JSONObject informationData2;
+    private JSONObject informationData3;
     private JSONArray locations;
+
+    private InformationType currentType;
 
     private static final Vector2DTransformer MAP_TRANSFORMER = 
         (Vector2D vector2D) ->
         {
             return vector2D
                 .zoom(1, -1)
-                .add(-117.5, 26.7)
+                .add(-117.5, 27.0)
                 .zoom(1, 110751.0 / 101751.0)
                 .zoom(200, 200);
         }
     ;
+    private double userScale = 1.0;
+    private double lastUserScale = userScale;
 
 
     @FXML private Pane informationMapRoom;
@@ -68,6 +73,8 @@ public class ObserveDataController implements Initializable
 
     @FXML private Label locationNameLabel;
     @FXML private Label regionNameLabel;
+
+    @FXML private Label observeTimeLabel;
 
     @FXML private Label  elevLabel;
     @FXML private Label  wdirLabel;
@@ -95,7 +102,8 @@ public class ObserveDataController implements Initializable
         loadInformationMap();
         loadInformations();
         
-        informationMapRoom.getChildren().setAll(renderInformationMapPane(InformationType.TEMP));
+        currentType = InformationType.TEMP;
+        informationMapRoom.getChildren().setAll(renderInformationMapPane());
 
         informationPanelVBox.setVisible(false);
 
@@ -113,6 +121,10 @@ public class ObserveDataController implements Initializable
             "本日最低溫"
         );
         typeChoiceBox.setValue("溫度");
+
+        ScrollPane mapScrollPane = (ScrollPane)informationMapPane.getChildren().get(0);
+        mapScrollPane.setHvalue(0.45);
+        mapScrollPane.setVvalue(0.07);
     }
 
     @FXML
@@ -120,25 +132,102 @@ public class ObserveDataController implements Initializable
     {
 
         String typeString = (String)typeChoiceBox.getValue();
-        InformationType type;
         switch(typeString)
         {
-            case        "海拔高度": type = InformationType.ELEV; break;
-            case           "風向": type = InformationType.WDIR; break;
-            case           "風速": type = InformationType.WDSD; break;
-            case           "溫度": type = InformationType.TEMP; break;
-            case        "相對溼度": type = InformationType.HUMD; break;
-            case           "氣壓": type = InformationType.PRES; break;
-            case      "日累積雨量": type = InformationType.H_24R; break;
-            case "小時最大陣風風速": type = InformationType.H_FX; break;
-            case "小時最大陣風風向": type = InformationType.H_XD; break;
-            case      "本日最高溫": type = InformationType.D_TX; break;
-            case      "本日最低溫": type = InformationType.D_TN; break;
-            default:              type = InformationType.ELEV;
+            case        "海拔高度": currentType = InformationType.ELEV; break;
+            case           "風向": currentType = InformationType.WDIR; break;
+            case           "風速": currentType = InformationType.WDSD; break;
+            case           "溫度": currentType = InformationType.TEMP; break;
+            case        "相對溼度": currentType = InformationType.HUMD; break;
+            case           "氣壓": currentType = InformationType.PRES; break;
+            case      "日累積雨量": currentType = InformationType.H_24R; break;
+            case "小時最大陣風風速": currentType = InformationType.H_FX; break;
+            case "小時最大陣風風向": currentType = InformationType.H_XD; break;
+            case      "本日最高溫": currentType = InformationType.D_TX; break;
+            case      "本日最低溫": currentType = InformationType.D_TN; break;
+            default:              currentType = InformationType.ELEV;
         }
 
-        informationMapPane.setInformationElements(informationDataToInformations(locations, type));
-        informationMapPane.renderInformations(type, locations);
+        renderInformationMapPaneInformationOnly();
+        // informationMapPane.setInformationElements(informationDataToInformations(locations, currentType));
+        // informationMapPane.renderInformations(currentType, locations);
+    }
+
+    @FXML
+    private void onMouseClickZoomInButton(MouseEvent mouseEvent)
+    {
+        if(userScale < 4.0)
+        {
+            lastUserScale = userScale;
+            if(userScale < 1.0)
+            {
+                userScale += 0.1;
+            }
+            else if(userScale < 2.0)
+            {
+                userScale += 0.2;
+            }
+            else
+            {
+                userScale += 0.5;
+            }
+            informationMapPane.setOuterTransformer(getUserTransformer());
+
+            informationMapPane.renderMap();
+            informationMapPane.renderInformations(currentType, locations);
+
+            scaleMapScrollPane();
+        }
+    }
+
+    @FXML
+    private void onMouseClickZoomOutButton(MouseEvent mouseEvent)
+    {
+        if(userScale >= 0.5)
+        {
+            lastUserScale = userScale;
+            if(userScale < 1.0)
+            {
+                userScale -= 0.1;
+            }
+            else if(userScale < 2.0)
+            {
+                userScale -= 0.2;
+            }
+            else
+            {
+                userScale -= 0.5;
+            }
+            informationMapPane.setOuterTransformer(getUserTransformer());
+            
+            informationMapPane.renderMap();
+            informationMapPane.renderInformations(currentType, locations);
+
+            scaleMapScrollPane();
+        }
+    }
+
+    private Vector2DTransformer getUserTransformer()
+    {
+        Vector2DTransformer userTransformer = 
+            (Vector2D vector2D) ->
+            {
+                return MAP_TRANSFORMER.transform(vector2D).zoom(userScale, userScale);
+            }
+        ;
+
+        return userTransformer;
+    }
+
+    private void scaleMapScrollPane()
+    {
+        ScrollPane mapScrollPane = (ScrollPane)informationMapPane.getChildren().get(0);
+        double clipWidth = ((Rectangle)mapScrollPane.getClip()).getWidth();
+        double clipHeight = ((Rectangle)mapScrollPane.getClip()).getHeight();
+        double contentWidth = ((Pane)mapScrollPane.getContent()).getWidth();
+        double contentHeight = ((Pane)mapScrollPane.getContent()).getHeight();
+        mapScrollPane.setHvalue((mapScrollPane.getHvalue()) / lastUserScale * userScale + (clipWidth  / 2 * (userScale / lastUserScale - 1)) / contentWidth );
+        mapScrollPane.setVvalue((mapScrollPane.getVvalue()) / lastUserScale * userScale + (clipHeight / 2 * (userScale / lastUserScale - 1)) / contentHeight);
     }
 
     private void loadInformationMap()
@@ -165,9 +254,16 @@ public class ObserveDataController implements Initializable
         ).getResponseContent();
 
         informationData2 = new JSONObject(data2);
+
+        String data3 = ca.requestDatastore(
+            CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS,
+            "elementName", "ELEV,RAIN,MIN_10,HOUR_3,HOUR_6,HOUR_12,NOW"
+        ).getResponseContent();
+
+        informationData3 = new JSONObject(data3);
     }
 
-    private InformationMapPane_Rev renderInformationMapPane(InformationType type)
+    private InformationMapPane_Rev renderInformationMapPane()
     {
         JSONArray locations1 = informationData1.getJSONObject("records").getJSONArray("location");
         JSONArray locations2 = informationData2.getJSONObject("records").getJSONArray("location");
@@ -175,16 +271,22 @@ public class ObserveDataController implements Initializable
         locationsList.addAll(locations2.toList());
         locations = new JSONArray(locationsList);
 
-        Vector<InformationElement> informations = informationDataToInformations(locations, type);
+        Vector<InformationElement> informations = informationDataToInformations(locations, currentType);
 
-        informationMapPane = new InformationMapPane_Rev(520, 520, MAP_TRANSFORMER, topoJsonRenderer, informations);
-        informationMapPane.setMinInnerWidth(1000);
-        informationMapPane.setMinInnerHeight(1000);
+        informationMapPane = new InformationMapPane_Rev(520, 520, getUserTransformer(), topoJsonRenderer, informations);
+        informationMapPane.setMinInnerWidth(520);
+        informationMapPane.setMinInnerHeight(520);
         informationMapPane.render();
         informationMapPane.renderMap();
-        informationMapPane.renderInformations(type, locations);
+        informationMapPane.renderInformations(currentType, locations);
 
         return informationMapPane;
+    }
+
+    private void renderInformationMapPaneInformationOnly()
+    {
+        informationMapPane.setInformationElements(informationDataToInformations(locations, currentType));
+        informationMapPane.renderInformations(currentType, locations);
     }
 
     public void showInformationPanel(JSONObject location)
@@ -195,6 +297,8 @@ public class ObserveDataController implements Initializable
             + "・" +
             location.getJSONArray("parameter").getJSONObject(2).getString("parameterValue")
         );
+
+        setLabelData(observeTimeLabel, location.getJSONObject("time").getString("obsTime"));
 
         setLabelData( elevLabel, location.getJSONArray("weatherElement").getJSONObject( 0).getString("elementValue"));
         setLabelData( wdirLabel, location.getJSONArray("weatherElement").getJSONObject( 1).getString("elementValue"));

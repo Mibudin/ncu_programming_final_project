@@ -117,7 +117,7 @@
 
 .information-map-pane-rev
 {
-    -fx-background-color: #202020e0;
+    -fx-background-color: #202020d8;
 }
 .information-map-pane-rev > .scroll-pane
 {
@@ -228,6 +228,18 @@
 .scroll-bar:vertical .thumb {
     -fx-background-color: #10165F;
     -fx-background-radius: 5em;
+}
+
+.scroll-bar:horizontal .thumb:pressed,
+.scroll-bar:vertical .thumb:pressed
+{
+    -fx-background-color : #1620A1;
+}
+
+.scroll-bar:horizontal .thumb:hover,
+.scroll-bar:vertical .thumb:hover
+{
+    -fx-background-color : #1620A1;
 }
 
 .scroll-pane > .corner {

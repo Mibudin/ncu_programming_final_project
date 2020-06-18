@@ -36,7 +36,7 @@ public class MainSceneController implements Initializable
     {
         setTitleBarDragEvent();
 
-        homePageTab.setContent(SceneManager._homePage);
+        homePageTab.setContent(SceneManager._forecastData);
         // try {
         //     observeDataTab.setContent(App.getJavafxApp().test());
         // } catch (Exception e) {
@@ -44,6 +44,9 @@ public class MainSceneController implements Initializable
         //     e.printStackTrace();
         // }
         observeDataTab.setContent(SceneManager._observeData);
+
+        homePageTab.setDisable(true);
+        radarDataTab.setDisable(true);
     }
 
     private void setTitleBarDragEvent()
