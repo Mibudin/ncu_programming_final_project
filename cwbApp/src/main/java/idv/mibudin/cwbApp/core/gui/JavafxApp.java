@@ -23,6 +23,7 @@ import idv.mibudin.cwbApp.core.data.InformationGroup;
 import idv.mibudin.cwbApp.core.data.TopoJson;
 import idv.mibudin.cwbApp.core.data.Vector2D;
 import idv.mibudin.cwbApp.core.data.Information.InformationType;
+import idv.mibudin.cwbApp.core.tool.ResourceLoader;
 import idv.mibudin.cwbApp.core.tool.VectorTools.Vector2DTransformer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -235,7 +236,8 @@ public class JavafxApp extends Application
          * TODO: For Test
          */
         mainStage.initStyle(StageStyle.TRANSPARENT);
-
+        
+        mainStage.getIcons().add(ResourceLoader.loadImage("image/favicon.ico"));
         mainStage.setTitle(TITLE);
         mainStage.setResizable(IS_RESIZABLE);
         mainStage.centerOnScreen();

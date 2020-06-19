@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import idv.mibudin.cwbApp.App;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
 
 
 public class ResourceLoader
@@ -62,5 +63,10 @@ public class ResourceLoader
         }
         
         return null;
+    }
+
+    public static Image loadImage(String filePath)
+    {
+        return new Image(rootClass.getResourceAsStream(filePath));
     }
 }
