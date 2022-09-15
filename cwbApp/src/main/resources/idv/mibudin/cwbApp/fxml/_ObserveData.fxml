@@ -332,7 +332,7 @@
                   </HBox>
                   <HBox prefHeight="0.0" prefWidth="200.0">
                      <children>
-                        <Label text="本日最高溫時間：　">
+                        <Label text="　時間：　">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -370,7 +370,7 @@
                   </HBox>
                   <HBox prefHeight="0.0" prefWidth="200.0">
                      <children>
-                        <Label text="本日最低溫時間：　">
+                        <Label text="　時間：　">
                            <font>
                               <Font size="14.0" />
                            </font>

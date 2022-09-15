@@ -151,7 +151,8 @@ public class JavafxApp extends Application
         // parameters.put("parameterName", "CITY");
         // String data = ca.requestDatastore("O-A0002-001", parameters).getResponseContent();
 
-        CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
+        // CwbApi ca = new CwbApi("CWB-D3AA9928-023B-4902-BBAB-55FB9A448508");
+        CwbApi ca = new CwbApi(CwbApi.DEFAULT_AUTHORIZATION_KEY);
         ca.setShouldReturnJson(true);
         String data = ca.requestDatastore(
             // CwbApiDataID.AUTO_RAIN_STA__RAIN_OBS

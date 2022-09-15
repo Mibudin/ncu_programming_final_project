@@ -1,5 +1,12 @@
 
 
+@font-face
+{
+    font-family: "Sarasa UI TC";
+    src: url("../font/sarasa-ui-tc-regular.ttf");
+}
+
+
 .root
 {
     -fx-base: #202020;
@@ -29,6 +36,10 @@
 
     /* Delete the effect of focusing */
     -fx-focus-color: transparent;
+}
+.root *
+{
+    -fx-font-family: "Sarasa UI TC", sans-serif;
 }
 
 /* Fix derived prompt color for text fields */
